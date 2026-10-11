@@ -1,6 +1,6 @@
 [package]
 name = "ferrite-aurora"
-version = "0.1.0"
+version = "0.1.1"
 description = "NOAA space weather and aurora forecasts in a Ferrite dashboard."
 license = "Apache-2.0"
 authors = ["Ryan Wetzstein"]
