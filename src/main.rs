@@ -1,4 +1,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+mod prefs;
 mod probe;
 mod space;
 mod worker;
@@ -59,14 +60,14 @@ impl Aurora {
                 commands.push(
                     command(format!("Scheme: {}", scheme.name))
                         .group("Theme")
-                        .on_run(move |_, cx| theme::set_scheme(scheme, cx)),
+                        .on_run(move |_, cx| prefs::scheme(scheme, cx)),
                 );
             }
             commands.push(
                 command("Toggle light / dark")
                     .group("Theme")
                     .on_run(|window, cx| {
-                        theme::set_appearance(
+                        prefs::appearance(
                             if theme::appearance(cx) == Appearance::Light {
                                 Appearance::Dark
                             } else {
@@ -215,14 +216,12 @@ impl Render for Aurora {
                     "Your coordinates: {:.2}, {:.2}",
                     self.location.0, self.location.1
                 )))
-                .child(
-                    div().child(format!(
+                .child(div().child(format!(
                         "Local model intensity: {}",
                         space::intensity(&data.grid, self.location.0, self.location.1)
                             .map(|v| format!("{v}%"))
                             .unwrap_or_else(|| "Unavailable".into())
-                    )),
-                );
+                    )));
             let mut globe = panel("Aurora globe")
                 .meta("NORTH POLAR VIEW")
                 .flex_1()
@@ -344,8 +343,7 @@ fn main() {
         return;
     }
     gpui_platform::application().run(|cx: &mut App| {
-        ferrite_design::init(Appearance::Dark, cx);
-        theme::apply_env(cx);
+        prefs::init(cx);
         cx.bind_keys([KeyBinding::new("ctrl-shift-p", TogglePalette, None)]);
         let options =
             chrome::remembered_window_options("aurora", "Aurora", size(px(1180.), px(860.)), cx);
