@@ -17,3 +17,7 @@ The menu and Ctrl+Shift+P expose schemes, appearance, and refresh. Location and 
 Rust 1.92 or newer: cargo run. Run cargo test and cargo clippy --all-targets. `--smoke` fetches the live NOAA feeds, and `--version` reports the package version.
 
 Data: NOAA Space Weather Prediction Center, https://services.swpc.noaa.gov/ . Ferrite design is pinned to commit 4ddbb40. Apache-2.0.
+
+## Settings
+
+Open the sliders button in the title bar, press Ctrl+, or choose Settings from the command palette. All ten schemes, Dark/Light/System appearance, motion refresh rate (12 to 240 FPS), and row density apply immediately and persist per app. Save failures appear in Settings. Start with `--settings` to open the drawer directly. Ferrite launcher environment overrides take precedence at startup.

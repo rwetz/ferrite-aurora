@@ -1,6 +1,8 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 mod prefs;
+mod prefs_store;
 mod probe;
+mod settings_ui;
 mod space;
 mod worker;
 use ferrite_design::prelude::*;
@@ -11,6 +13,7 @@ use gpui::{
 
 struct Aurora {
     palette: Entity<CommandPalette>,
+    settings: Entity<settings_ui::Settings>,
     _appearance: Subscription,
     input: Entity<TextInput>,
     _input: Subscription,
@@ -42,6 +45,7 @@ impl Aurora {
             }
         });
         let mut app = Self {
+            settings: cx.new(|_| settings_ui::Settings::new()),
             palette: cx.new(|cx| CommandPalette::new(window, cx)),
             _appearance: theme::follow_system(window),
             input,
@@ -85,6 +89,7 @@ impl Aurora {
                         let _ = weak.update(cx, |this, cx| this.refresh(cx));
                     }),
             );
+            commands.push(settings_ui::settings_command(app.settings.clone()));
             palette.set_commands(commands, cx);
         });
         app.refresh(cx);
@@ -222,6 +227,8 @@ impl Render for Aurora {
                             .map(|v| format!("{v}%"))
                             .unwrap_or_else(|| "Unavailable".into())
                     )));
+            let viewport = window.viewport_size();
+            let globe_h = px((f32::from(viewport.height) - 220.).clamp(240., 430.));
             let mut globe = panel("Aurora globe")
                 .meta("NORTH POLAR VIEW")
                 .flex_1()
@@ -246,7 +253,9 @@ impl Render for Aurora {
                             .into_any_element()
                     })
                     .w_full()
-                    .h(px(430.)),
+                    // Square-ish to the panel, but no taller than the window
+                    // can show beside the readings.
+                    .h(globe_h),
                 );
             }
             globe=globe.child(div().child(format!("OVATION forecast: {}",data.forecast_time)))
@@ -290,25 +299,30 @@ impl Render for Aurora {
                 .on_action(cx.listener(|this, _: &TogglePalette, window, cx| {
                     this.palette.update(cx, |p, cx| p.toggle(window, cx))
                 }))
+                .on_action(cx.listener(|this, _: &settings_ui::ToggleSettings, _, cx| {
+                    this.settings.update(cx, |s, cx| s.toggle(cx));
+                }))
+                .child(self.settings.clone())
                 .child(self.palette.clone())
                 .child(
-                    title_bar("Aurora").child(menu).child(
-                        Button::new("refresh")
-                            .label("Refresh")
-                            .ghost()
-                            .small()
-                            .disabled(self.busy)
-                            .on_click(cx.listener(|this, _, _, cx| this.refresh(cx))),
-                    ),
+                    title_bar("Aurora")
+                        .child(settings_ui::button(self.settings.clone()))
+                        .child(menu)
+                        .child(
+                            Button::new("refresh")
+                                .label("Refresh")
+                                .ghost()
+                                .small()
+                                .disabled(self.busy)
+                                .on_click(cx.listener(|this, _, _, cx| this.refresh(cx))),
+                        ),
                 )
                 .child(
-                    div()
-                        .id("content")
+                    // A visible bar, so a short window reads as "there's more".
+                    scroll_area("content")
                         .flex_1()
                         .min_h_0()
-                        .overflow_y_scroll()
-                        .p_4()
-                        .child(content),
+                        .child(div().p_4().child(content)),
                 )
                 .child(
                     status_bar()
@@ -344,7 +358,10 @@ fn main() {
     }
     gpui_platform::application().run(|cx: &mut App| {
         prefs::init(cx);
-        cx.bind_keys([KeyBinding::new("ctrl-shift-p", TogglePalette, None)]);
+        cx.bind_keys([
+            KeyBinding::new("ctrl-shift-p", TogglePalette, None),
+            KeyBinding::new("ctrl-,", settings_ui::ToggleSettings, None),
+        ]);
         let options =
             chrome::remembered_window_options("aurora", "Aurora", size(px(1180.), px(860.)), cx);
         cx.open_window(options, |window, cx| {
