@@ -1,8 +1,20 @@
-# Aurora
+<p align="center">
+  <img src="assets/logo.svg" width="128" height="128" alt="Aurora logo">
+</p>
 
-![Aurora icon](assets/logo.svg)
+<h1 align="center">Aurora</h1>
 
-A native Ferrite dashboard for NOAA space weather: live Kp, solar wind speed and density, Bz, recent activity, and the OVATION aurora model projected onto a dithered north-polar globe.
+<p align="center">
+  A native Ferrite dashboard for NOAA space weather: live Kp, solar wind, Bz and a dithered aurora globe.
+</p>
+
+<p align="center">
+  <a href="https://github.com/rwetz/ferrite-aurora/actions/workflows/ci.yml"><img src="https://github.com/rwetz/ferrite-aurora/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/rwetz/ferrite-aurora/releases/latest"><img src="https://img.shields.io/github/v/release/rwetz/ferrite-aurora?color=F2A93B&labelColor=18181B" alt="Latest release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-3D3D42?labelColor=18181B" alt="License"></a>
+</p>
+
+![Aurora showing the dithered aurora globe and space weather readings](docs/main.png)
 
 Enter latitude,longitude to mark your location. Northern locations appear as a cross; the model intensity at either hemisphere is reported separately. NOAA refreshes every five minutes. Missing optional feeds remain unavailable while Kp continues to display. No API key is needed. Model intensity is not a visibility guarantee.
 
@@ -21,6 +33,13 @@ Data: NOAA Space Weather Prediction Center, https://services.swpc.noaa.gov/ . Fe
 ## Settings
 
 Open the sliders button in the title bar, press Ctrl+, or choose Settings from the command palette. All ten schemes, Dark/Light/System appearance, motion refresh rate (12 to 240 FPS), and row density apply immediately and persist per app. Save failures appear in Settings. Start with `--settings` to open the drawer directly. Ferrite launcher environment overrides take precedence at startup.
+
+## Keys
+
+| Keys | |
+|---|---|
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> | Command palette |
+| <kbd>Ctrl</kbd>+<kbd>,</kbd> | Settings |
 
 ---
 
